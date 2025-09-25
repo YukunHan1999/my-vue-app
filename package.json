@@ -1,0 +1,34 @@
+{
+  "name": "my-vue-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "@humanwhocodes/env": "^4.0.1",
+    "@vue/compiler-sfc": "^3.5.18",
+    "axios": "^1.9.0",
+    "element-plus": "^2.10.4",
+    "monaco-editor": "^0.52.2",
+    "pinia": "^3.0.2",
+    "sass": "^1.89.0",
+    "vite-plugin-monaco-editor": "^1.1.0",
+    "vue": "^3.5.18",
+    "vue-router": "4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "@vue/tsconfig": "^0.7.0",
+    "element-theme-chalk": "github:ElementUI/theme-chalk",
+    "typescript": "5",
+    "vite": "^6.3.5",
+    "vue-tsc": "^3.0.4"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}

@@ -1,0 +1,14 @@
+# 本机
+yarn build
+scp -r ./dist hyk@192.168.10.196:~/HYK/nginx/
+
+# 远程
+eval $(minikube docker-env)
+docker build -t vue-nginx-app .
+kubectl delete -f deployment.yaml 
+kubectl delete -f service.yaml 
+kubectl delete -f istio-gateway.yaml
+kubectl apply -f deployment.yaml 
+kubectl apply -f service.yaml 
+kubectl apply -f istio-gateway.yaml
+kubectl port-forward --address 0.0.0.0 -n istio-system svc/istio-ingressgateway 8080:80
