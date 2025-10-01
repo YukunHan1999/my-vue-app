@@ -103,6 +103,7 @@ const handleCurrentChange = (val: number) => {
   loadCodeData(val, pageSize.value).then((res: AxiosResponse) => {
     // 直接替换整个数组内容（保持响应性）
     tableData.value = res.data.data
+    currentPage.value = val
   })
 }
 
@@ -148,10 +149,9 @@ const confirmEdit = () => {
   })
 }
 // 修改前数据回显
-const showData = (index: any, row: any) => {
-  console.log(index, row);
+const showData = (_: any, row: any) => {
   formTitle.value = '修改单据'
-  form.id = row.id
+  form.id = row.id + ''
   form.lang = row.lang
   form.name = row.name
   form.code = row.code
