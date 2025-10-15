@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <br />
     <el-row>
       <el-col :span="1"></el-col>
@@ -97,6 +97,8 @@ const handleSizeChange = (val: number) => {
   loadCodeData(currentPage.value, val).then((res: AxiosResponse) => {
     // 直接替换整个数组内容（保持响应性）
     tableData.value = res.data.data
+    currentPage.value = 1
+    pageSize.value = val
   })
 }
 const handleCurrentChange = (val: number) => {
@@ -217,6 +219,12 @@ const deleteData = (row: any) => {
 </script>
 
 <style scoped>
+.container {
+  width: 60vw;
+  margin: 50px auto;
+}
+
+
 .el-button--text {
   margin-right: 15px;
 }

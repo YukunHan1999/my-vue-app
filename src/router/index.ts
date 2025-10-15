@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-rou
 
 import Home from '@/views/home/index.vue'
 import Code from '@/views/code/edit.vue'
+import Directory from '@/views/code/directory.vue'
 import Doc from '@/views/doc/index.vue'
 const routes: Array<RouteRecordRaw> = [
   {
@@ -18,9 +19,9 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: '/code',
+        path: '/code/:id',
         name: '测试',
-        component: Code,
+        component: Directory,
         meta: {
           title: '测试'
         }
@@ -32,6 +33,11 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: '文档'
         }
+      },
+      {
+        path: '/preview',
+        name: 'preview',
+        component: Code
       }
     ]
   }

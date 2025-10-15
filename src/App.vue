@@ -1,53 +1,54 @@
 <template>
-  <div id="#app">
-    <div>
-      <el-drawer v-model="flag" :size="300" :with-header="false" direction="ltr">
-        <el-menu active-text-color="#ffd04b" background-color="#545c64" popper-effect="dark" class="el-menu-vertical-demo"  @select="handleSelect"
-              :default-active="activeUrl" text-color="#fff" >
-              <template v-for="firstMenuItem in menudata">
-                <template v-if="firstMenuItem.children">
-                  <el-sub-menu :index="firstMenuItem.index">
-                    <template #title>
-                      <span v-text="firstMenuItem.title"></span>
-                    </template>
-                    <template v-for="secondMenuItem in firstMenuItem.children">
-                      <template v-if="secondMenuItem.children">
-                        <el-sub-menu :index="secondMenuItem.index">
-                          <template #title>
-                            <span v-text="secondMenuItem.title"></span>
-                          </template>
-                          <template v-for="thirdMenuItem in secondMenuItem.children">
-                            <el-menu-item :index="thirdMenuItem.index">
-                              <span v-text="thirdMenuItem.title"></span>
-                            </el-menu-item>
-                          </template>
-                        </el-sub-menu>
-                      </template>
-                      <template v-else>
-                        <el-menu-item :index="secondMenuItem.index">
-                          <span v-text="secondMenuItem.title"></span>
-                        </el-menu-item>
-                      </template>
-                    </template>
-                  </el-sub-menu>
-                </template>
-                <template v-else>
-                  <el-menu-item :index="firstMenuItem.index">
+  <div>
+    <el-drawer v-model="flag" :size="300" :with-header="false" direction="ltr">
+      <el-menu active-text-color="#ffd04b" background-color="#545c64" popper-effect="dark" class="el-menu-vertical-demo"  @select="handleSelect"
+            :default-active="activeUrl" text-color="#fff" >
+            <template v-for="firstMenuItem in menudata">
+              <template v-if="firstMenuItem.children">
+                <el-sub-menu :index="firstMenuItem.index">
+                  <template #title>
                     <span v-text="firstMenuItem.title"></span>
-                </el-menu-item>
-                </template>
+                  </template>
+                  <template v-for="secondMenuItem in firstMenuItem.children">
+                    <template v-if="secondMenuItem.children">
+                      <el-sub-menu :index="secondMenuItem.index">
+                        <template #title>
+                          <span v-text="secondMenuItem.title"></span>
+                        </template>
+                        <template v-for="thirdMenuItem in secondMenuItem.children">
+                          <el-menu-item :index="thirdMenuItem.index">
+                            <span v-text="thirdMenuItem.title"></span>
+                          </el-menu-item>
+                        </template>
+                      </el-sub-menu>
+                    </template>
+                    <template v-else>
+                      <el-menu-item :index="secondMenuItem.index">
+                        <span v-text="secondMenuItem.title"></span>
+                      </el-menu-item>
+                    </template>
+                  </template>
+                </el-sub-menu>
               </template>
+              <template v-else>
+                <el-menu-item :index="firstMenuItem.index">
+                  <span v-text="firstMenuItem.title"></span>
+              </el-menu-item>
+              </template>
+            </template>
 
-            </el-menu>
-      </el-drawer>
-      <router-view v-if="isRouterAlive" />
-    </div>
+          </el-menu>
+    </el-drawer>
+    <router-view v-if="isRouterAlive" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, provide, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { initContentNav } from './store';
+initContentNav()
+
 const router = useRouter()
 const menudata = [
   {
@@ -67,7 +68,7 @@ const menudata = [
         "title": "文档",
         children: [
           {
-            "index": "/code",
+            "index": "/code/0",
             "title": "代码"
           },
         ]
@@ -79,7 +80,7 @@ const menudata = [
     "title": "Home"
   },
   {
-    "index": "/code",
+    "index": "/code/0",
     "title": "代码"
   },
   {
@@ -128,23 +129,10 @@ const handleKeyDown = (event: any) => {
     }
   }
 };
-
-
-
-
-
-// 重新加载
+// =====================================================重新加载
 const isRouterAlive = ref(true)
-const isReload = ref<Boolean>(true)
 
 provide("reloadFile", () => {
-  isReload.value = false
-  nextTick(() => {
-    isReload.value = true
-  })
-})
-
-provide("reload", () => {
   reload()
 })
 
@@ -157,17 +145,4 @@ const reload = () => {
 </script>
 
 <style scoped lang="sass">
-nav 
-  background-color: #292a2d
-  a
-    font-weight: bold
-    color: white
-
-  & .router-link-exact-active
-    color: #42b983
-
-.item 
-  position: absolute
-  right: 25px
-  color: white
 </style>

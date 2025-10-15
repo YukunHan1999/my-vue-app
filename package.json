@@ -11,12 +11,14 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
     "@humanwhocodes/env": "^4.0.1",
+    "@types/uuid": "^11.0.0",
     "@vue/compiler-sfc": "^3.5.18",
     "axios": "^1.9.0",
     "element-plus": "^2.10.4",
     "monaco-editor": "^0.52.2",
     "pinia": "^3.0.2",
     "sass": "^1.89.0",
+    "uuid": "^13.0.0",
     "vite-plugin-monaco-editor": "^1.1.0",
     "vue": "^3.5.18",
     "vue-router": "4"
