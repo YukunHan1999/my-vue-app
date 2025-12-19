@@ -4,7 +4,7 @@
         <div class="image-container">
             <div v-if="selectedLine" class="image-list">
                 <el-image v-for="src in urls" :key="src" :src="src" style="width: 100%; height: 300px" :zoom-rate="1.2"
-                    :preview-src-list="urls" show-progess fit="cover" />
+                    :preview-src-list="[src]" show-progess fit="cover" />
             </div>
         </div>
         <el-drawer v-model="flag" :size="300" direction="rtl">

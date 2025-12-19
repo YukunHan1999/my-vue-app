@@ -3,14 +3,6 @@ export interface LoginData {
   password: string
 }
 
-export interface ClearAttData {
-  dbgid: number
-  uuid: string
-  attid: number,
-  pgmid: number,
-  pgmuuid: string,
-}
-
 export interface DebugInfoData {
   dbgid: number
   lineno: number
@@ -38,8 +30,13 @@ export interface PackageData {
   pgm: ProgramData[]
 }
 
-export interface AddPkg {
+export interface PkgInfo {
   pkgData: PackageData
+  attGarbage: number[]
+}
+
+export interface ClearPkg {
+  pkgid: number
   attGarbage: number[]
 }
 

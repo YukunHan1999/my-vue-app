@@ -1,5 +1,5 @@
 import type { CodeTemplate } from '../types/test.t'
-import type { DirData,  RemovePkgOrDir, AddPkg} from '../types/data.t'
+import type { DirData,  RemovePkgOrDir, PkgInfo, ClearPkg} from '../types/data.t'
 import $http from './index'
 
 // 登录请求
@@ -7,17 +7,19 @@ import $http from './index'
 
 
 // code
-export const addContent = (file: DirData) => $http({ url: '/api/debug/dir', method: "POST", data: file })
+export const addContent = (data: DirData) => $http({ url: '/api/debug/dir', method: "POST", data })
 // new package
-export const addPkgInfo = (file: AddPkg) => $http({ url: '/api/debug/pkg', method: "POST", data: file })
+export const addPkgInfo = (data: PkgInfo) => $http({ url: '/api/debug/pkg', method: "POST", data })
 // new package
-export const updatePkgInfo = (file: AddPkg) => $http({ url: '/api/debug/pkg', method: "PUT", data: file })
+export const updatePkgInfo = (data: PkgInfo) => $http({ url: '/api/debug/pkg', method: "PUT", data })
+// new package
+export const clearPkgData = (data: ClearPkg) => $http({ url: '/api/debug/pkg', method: "DELETE", data })
 // new package
 export const loadPkg = (id: string) => $http({ url: `/api/debug/pkg/${id}`, method: "GET"})
 // remove pkg or Dir
 export const deletePkgOrDir = (file: RemovePkgOrDir) => $http({ url: `/api/debug`, method: 'DELETE', data: file })
 // 修改文件
-export const updateFile = (file: DirData) => $http({ url: '/api/debug', method: "PUT", data: file })
+export const updateContent = (file: DirData) => $http({ url: '/api/debug/dir', method: "PUT", data: file })
 // 获取所有目录结构
 export const fetchDirList = () => $http({ url: '/api/debug', method: 'GET' })
 // 获取文件列表

@@ -54,25 +54,34 @@
                 </span>
             </template>
         </el-dialog>
-        <el-drawer v-model="isEditorablePkg" direction="ttb" before-close="" :close-on-press-escape="true" size="100%">
+        <el-drawer v-model="isEditorablePkg" direction="ttb" :before-close="cancelPkgInfo" :close-on-press-escape="true"
+            size="100%">
             <template #header>
                 <h4> {{ isAddPkg ? 'ADD PKG' : 'EDIT PKG' }}</h4>
             </template>
             <template #default>
                 <div class="pkgEdit">
-                    <el-form class="blogForm" :model="pkgTableData">
+                    <el-form class="pkgForm" :model="pkgTableData">
                         <el-row>
                             <el-col :offset="2" :span="4">
                                 <el-form-item label="标题:">
                                     <el-input v-model="pkgTableData.pkgname" style="width: 240px;" />
                                 </el-form-item>
                             </el-col>
-                            <el-col :span="12">
+                            <el-col :offset="1" :span="4">
                                 <el-form-item label="描述:">
                                     <textarea v-model="pkgTableData.pkgdesc" style="width: 240px; font-size:16px"
                                         cols="150" rows="2"></textarea>
                                 </el-form-item>
                             </el-col>
+                            <el-col :offset="1" :span="4">
+                                <el-form-item label="所属目录:">
+                                    <el-select v-model="pkgTableData.dirid" filterable placeholder="Please select" style="width: 240px">
+                                        <el-option v-for="item in dirArr" :key="item.id" :label="item.name" :value="Number(item.id)" />
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+
                         </el-row>
                     </el-form>
                     <div class="program">
@@ -81,10 +90,11 @@
                                 <el-table :data="pkgTableData.pgm" style="width: 100%" height="60vh"
                                     highlight-current-row @current-change="handlerPgmDataChange"
                                     :default-sort="{ prop: 'sort' }" :border="true" :preserve-expanded-content="true">
+                                    <el-table-column type="index" sortable label="index" width="60" />
                                     <el-table-column prop="pgmname" label="Name" width="180" />
                                     <el-table-column prop="pgmcode" label="Code" :show-overflow-tooltip="true"
                                         width="180" />
-                                    <el-table-column prop="pgmsort" label="Sort" width="90" />
+                                    <el-table-column prop="pgmsort" label="Sort" width="60" />
                                     <el-table-column align="right">
                                         <template #header>
                                             <el-button size="small" :icon="Plus" circle type="success"
@@ -102,6 +112,7 @@
 
                             <el-col :offset="2" :span="8">
                                 <el-table :data="currPgm?.dbg" style="width: 100%" height="60vh" :border="true">
+                                    <el-table-column type="index" sortable label="index" width="60" />
                                     <el-table-column prop="lineno" label="LineNo" width="180" />
                                     <el-table-column label="Attachment" width="180">
                                         <template #default="scope">
@@ -110,7 +121,7 @@
                                                 :preview-src-list="['/api/preview/' + scope.row.atturl]" />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="dbgsort" label="Sort" />
+                                    <el-table-column prop="dbgsort" label="Sort" width="60" />
                                     <el-table-column align="right">
                                         <template #header>
                                             <el-button size="small" :icon="Plus" circle type="primary"
@@ -133,25 +144,24 @@
             </template>
             <template #footer>
                 <div style="flex: auto">
-                    <el-button>cancel</el-button>
-                    <el-button type="warning" @click="clearPkgInfo">cancel</el-button>
+                    <el-button type="warning" @click="cancelPkgInfo">cancel</el-button>
                     <el-button type="success" @click="savePkgInfo">Save</el-button>
                     <el-button type="primary" @click="previewPkgInfo">Preview</el-button>
                 </div>
             </template>
         </el-drawer>
-        <el-drawer v-model="isEditorable" :title="isAddContent ? '添加目录' : '修改文件信息'" direction="rtl"
+        <el-drawer v-model="isEditorable" :title="isAddContent ? 'ADD DIR' : 'EDIT DIR'" direction="rtl"
             :before-close="handleClose" :close-on-press-escape="true" size="40%">
-            <el-form class="blogForm" :model="form" label-width="120px">
+            <el-form class="dirForm" :model="dirForm" label-width="120px">
                 <el-form-item label="标题:">
-                    <el-input v-model="form.name" />
+                    <el-input v-model="dirForm.name" />
                 </el-form-item>
                 <el-form-item label="描述:">
-                    <textarea v-model="form.desc" cols="30" rows="15" style="font-size:16px"></textarea>
+                    <textarea v-model="dirForm.desc" cols="30" rows="15" style="font-size:16px"></textarea>
                 </el-form-item>
                 <el-form-item label="所属目录:">
-                    <el-select v-model="form.dirId" filterable placeholder="Please select" style="width: 240px">
-                        <el-option v-for="item in initials" :key="item.id" :label="item.name" :value="item.id" />
+                    <el-select v-model="dirForm.dirId" filterable placeholder="Please select" style="width: 240px">
+                        <el-option v-for="item in dirArr" :key="item.id" :label="item.name" :value="Number(item.id)" />
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -166,6 +176,7 @@
             </template>
         </el-dialog>
         <el-table :data="data" style="width: 100%">
+            <el-table-column type="index" sortable label="index" width="120" />
             <el-table-column label="文件名称">
                 <template #default="scope">
                     <el-popover effect="light" trigger="hover" placement="top" width="auto">
@@ -208,13 +219,15 @@ import { useRouter, useRoute } from "vue-router";
 import {
     addContent,
     addPkgInfo,
+    clearPkgData,
     deletePkgOrDir,
     fetchDirList,
     fetchFileList,
     loadPkg,
-    updateFile,
+    updateContent,
+    updatePkgInfo,
 } from "../api/http";
-import type { AddPkg, ClearAttData, DebugInfoData, KateFileData, PackageData, ProgramData, RemovePkgOrDir } from "../types/data.t";
+import type { PkgInfo, ClearPkg, DebugInfoData, KateFileData, PackageData, ProgramData, RemovePkgOrDir } from "../types/data.t";
 import { formatDate } from "../util/dateutil";
 import { ElMessage, ElMessageBox, type UploadProps } from "element-plus";
 import { addContentNav, setPackageData } from "../store/index";
@@ -224,30 +237,21 @@ import { v4 as uuidv4 } from 'uuid';
 //=======================================================================PACKAGE
 // add or edit pkg
 const isEditorablePkg = ref<boolean>(false)
-// edit pkg
-const pkgForm = reactive({
-    id: "",
-    name: "",
-    desc: "",
-    srcFilename: "",
-    fileId: "",
-    dirId: "",
-    url: "",
-});
 const isAddPkg = ref<boolean>(false)
 // Clear Temporary Attachment List
-const clearAttIdArray = ref<ClearAttData[]>([])
+const clearAttIdArray = reactive<Set<Number>>(new Set())
 
 const openAddPkg = () => {
-    isAddPkg.value = true;
     // 清空表单所有数据
-    pkgForm.id = "";
-    pkgForm.name = "";
-    pkgForm.desc = "";
-    pkgForm.srcFilename = "";
-    pkgForm.dirId = parentId.value;
+    pkgTableData.pkgid = 0
+    pkgTableData.pkgname = ""
+    pkgTableData.pkgdesc = ""
+    pkgTableData.dirid = Number(parentId.value)
+    pkgTableData.pgm = []
+
+    isAddPkg.value = true
     isFile.value = true
-    isEditorablePkg.value = true;
+    isEditorablePkg.value = true
 }
 const pkgTableData = reactive<PackageData>({
     pkgid: 0,
@@ -265,33 +269,72 @@ const previewPkgInfo = () => {
 // save package info
 const savePkgInfo = () => {
     let attids: number[] = []
-    for (let tmp of clearAttIdArray.value) {
-        attids.push(tmp.attid)
+    for (let tmp of clearAttIdArray) {
+        attids.push(tmp.valueOf())
     }
-    let pkgData: AddPkg = {
+    let pkgData: PkgInfo = {
         pkgData: pkgTableData,
         attGarbage: attids,
     }
-    //  invoke save action
-    addPkgInfo(pkgData).then((res: any) => {
-        if (res.data.isSuccess === true) {
-            ElMessage({
-                type: 'success',
-                message: 'Success!',
-            })
-        }
-    })
+    if (pkgTableData.pkgid === 0) {
+        //  invoke save action
+        addPkgInfo(pkgData).then((res: any) => {
+            if (res.data.isSuccess === true) {
+                ElMessage({
+                    type: 'success',
+                    message: 'Success!',
+                })
+                // clear and close
+                pkgTableData.pkgid = 0
+                pkgTableData.pkgname = ''
+                pkgTableData.pkgdesc = ''
+                pkgTableData.dirid = 0
+                pkgTableData.pgm = []
+                isEditorablePkg.value = false
+            }
+        })
+    } else {
+        //  invoke save action
+        updatePkgInfo(pkgData).then((res: any) => {
+            if (res.data.isSuccess === true) {
+                ElMessage({
+                    type: 'success',
+                    message: 'Success!',
+                })
+                // clear and close
+                pkgTableData.pkgid = 0
+                pkgTableData.pkgname = ''
+                pkgTableData.pkgdesc = ''
+                pkgTableData.dirid = 0
+                pkgTableData.pgm = []
+                isEditorablePkg.value = false
+            }
+        })
+    }
 }
 // clear package info
-const clearPkgInfo = () => {
-    // clear temporary attachment
-    if (pkgTableData.pkgid !== 0) {
-        // all data is new data
-
-    } else {
-        // only data is new data
-
+const cancelPkgInfo = () => {
+    let attids: number[] = []
+    for (let tmp of clearAttIdArray) {
+        attids.push(tmp.valueOf())
     }
+    if (attids.length > 0) {
+        let clearPkg: ClearPkg = {
+            pkgid: pkgTableData.pkgid,
+            attGarbage: attids
+        }
+        // all data is new data
+        clearPkgData(clearPkg).then((res: any) => {
+            if (res.data.isSuccess === true) {
+                ElMessage({
+                    type: 'success',
+                    message: 'Success!',
+                })
+                isEditorablePkg.value = false
+            }
+        })
+    }
+    isEditorablePkg.value = false
 }
 
 //=======================================================================PROGRAM
@@ -327,6 +370,9 @@ const confirmPgmFormEdit = () => {
     if (isEditProgramDialogForm.value === false) {
         // add pgm
         pgmForm.uuid = uuidv4()
+        if (pkgTableData.pgm == null) {
+            pkgTableData.pgm = []
+        }
         pkgTableData.pgm.push({
             pgmid: 0,
             pgmname: pgmForm.pgmname,
@@ -431,7 +477,6 @@ const openDeletePgm = (row: ProgramData) => {
             })
         })
 }
-
 const handlerPgmDataChange = (pgm: ProgramData | undefined) => {
     currPgm.value = pgm
 }
@@ -461,19 +506,15 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (
     uploadFile
 ) => {
     if (response.code === 20000) {
-        // all history need to record
+        let newAttId: number = response.data.data.id
+        // all att data need to record
         if (dbgForm.attid !== 0) {
-            clearAttIdArray.value.push({
-                dbgid: dbgForm.dbgid,
-                uuid: dbgForm.uuid,
-                attid: dbgForm.attid,
-                pgmid: currPgm.value ? currPgm.value.pgmid : 0,
-                pgmuuid: currPgm.value ? currPgm.value.uuid : '',
-            })
+            clearAttIdArray.add(dbgForm.attid)
         }
-        dbgForm.attid = response.data.data.id
+        clearAttIdArray.add(newAttId)
+        dbgForm.attid = newAttId
         dbgForm.atttype = response.data.data.type
-        dbgForm.atturl = `${response.data.data.url}`
+        dbgForm.atturl = response.data.data.url
         imageUrl.value = URL.createObjectURL(uploadFile.raw!)
     }
 }
@@ -482,10 +523,10 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
     //        ElMessage.error('Avatar picture must be JPG format!')
     //        return false
     //    } 
-        if (rawFile.size / 1024 / 1024 > 2) {
-            ElMessage.error('Avatar picture size can not exceed 2MB!')
-            return false
-        }
+    if (rawFile.size / 1024 / 1024 > 2) {
+        ElMessage.error('Avatar picture size can not exceed 2MB!')
+        return false
+    }
     return true
 }
 const openAddDbg = (pgm: ProgramData | undefined) => {
@@ -511,13 +552,14 @@ const openEditDebugInfo = (pgm: ProgramData | undefined, row: DebugInfoData) => 
         // pgmid
         currentPgm.value = pgm
         // equal
-        dbgForm.dbgid = row.dbgid;
-        dbgForm.lineno = row.lineno;
-        dbgForm.dbgsort = row.dbgsort;
-        dbgForm.attid = row.attid;
-        dbgForm.atttype = row.atttype;
-        dbgForm.atturl = row.atturl;
-        dbgForm.uuid = row.uuid;
+        dbgForm.dbgid = row.dbgid
+        dbgForm.lineno = row.lineno
+        dbgForm.dbgsort = row.dbgsort
+        dbgForm.attid = row.attid
+        dbgForm.atttype = row.atttype
+        dbgForm.atturl = row.atturl
+        dbgForm.uuid = row.uuid
+        imageUrl.value = row.atturl
         // open
         debugInfoDialogForm.value = true
         isEditDebugInfoDialogForm.value = true
@@ -618,6 +660,9 @@ const confirmDbgFormEdit = () => {
         for (let i = 0; i < pkgTableData.pgm.length; i++) {
             if (pkgTableData.pgm[i].uuid === currentPgm.value.uuid) {
                 if (isEditDebugInfoDialogForm.value === false) {
+                    if (pkgTableData.pgm[i].dbg == null) {
+                        pkgTableData.pgm[i].dbg = []
+                    }
                     // add
                     pkgTableData.pgm[i].dbg.push({
                         dbgid: dbgForm.dbgid,
@@ -670,6 +715,9 @@ const confirmDbgFormEdit = () => {
         for (let i = 0; i < pkgTableData.pgm.length; i++) {
             if (pkgTableData.pgm[i].pgmid === currentPgm.value.pgmid) {
                 if (isEditDebugInfoDialogForm.value === false) {
+                    if (pkgTableData.pgm[i].dbg == null) {
+                        pkgTableData.pgm[i].dbg = []
+                    }
                     // add
                     pkgTableData.pgm[i].dbg.push({
                         dbgid: dbgForm.dbgid,
@@ -728,12 +776,12 @@ const isAddContent = ref<boolean>(false);
 const openAddForm = () => {
     isAddContent.value = true;
     // 清空表单所有数据
-    form.id = "";
-    form.name = "";
-    form.desc = "";
-    form.srcFilename = "";
-    form.dirId = parentId.value;
-    form.tags = [];
+    dirForm.id = "";
+    dirForm.name = "";
+    dirForm.desc = "";
+    dirForm.srcFilename = "";
+    dirForm.dirId = Number(parentId.value);
+    dirForm.tags = [];
     isFile.value = false
     isEditorable.value = true;
 };
@@ -763,13 +811,13 @@ const skip = async (row: KateFileData) => {
 // 编辑逻辑
 const isEditorable = ref(false);
 // 编辑表单
-const form = reactive({
+const dirForm = reactive({
     id: "",
     name: "",
     desc: "",
     srcFilename: "",
     fileId: "",
-    dirId: "",
+    dirId: 0,
     url: "",
     tags: [""],
 });
@@ -777,32 +825,83 @@ const form = reactive({
 // select 文件目录    // 获取编辑框标签列表
 const initials = ref<Array<KateFileData>>([]);
 
+const dirArr = ref<Array<KateFileData>>([]);
+
+const removeCurrDir = (curid: number) => {
+    // 获取编辑框目录列表
+    fetchDirList().then((res: any) => {
+        initials.value = res.data.data
+        let first :KateFileData = {    
+            id: '0',
+            name: 'root',
+            desc: '',
+            srcFilename: '',
+            url: '',
+            createdate: '',
+            updatedate: '',
+            visitCount: 0,
+            dirId: '',
+            fileId: '',
+            isdocx: 0,
+            deleted: 0,
+            tagList: []
+        }
+        // add root empty
+        initials.value.unshift(first)
+        dirArr.value = []
+        for (let i = 0; i < initials.value.length; i++) {
+            if (Number(initials.value[i].id) !== curid) {
+                dirArr.value.push(initials.value[i])
+            }
+        }
+    });
+}
+
 const handlerEdit = (_: string, row: KateFileData) => {
-    form.id = row.id;
-    form.name = row.name;
-    form.desc = row.desc;
-    form.srcFilename = row.srcFilename;
-    form.dirId = parentId.value;
-    form.tags = row.tagList;
-    form.url = row.url;
-    isFile.value = row.url.length !== 0;
-    isAddContent.value = false
-    isEditorable.value = true;
+    if (row.isdocx === 0) {
+        // handler directory
+        dirForm.id = row.id
+        dirForm.name = row.name
+        dirForm.desc = row.desc
+        dirForm.srcFilename = row.srcFilename
+        dirForm.dirId = Number(parentId.value)
+        dirForm.tags = row.tagList
+        dirForm.url = row.url
+        isFile.value = false
+        isAddContent.value = false
+        isEditorable.value = true
+
+        removeCurrDir(Number(row.id))
+    } else {
+        // handler Package
+        loadPkg(row.id).then((res: any) => {
+            // set package data, open the edit form
+            let pkgData: PackageData = res.data.data
+            pkgTableData.pkgid = pkgData.pkgid
+            pkgTableData.pkgname = pkgData.pkgname
+            pkgTableData.pkgdesc = pkgData.pkgdesc
+            pkgTableData.dirid = pkgData.dirid
+            pkgTableData.pgm = pkgData.pgm
+            isAddContent.value = false
+            isEditorablePkg.value = true
+        })
+        removeCurrDir(-1)
+    }
 };
 // 发送ajax请求修改数据，重新加载界面
-const handleClose = (done: () => void) => {
+const handleClose = () => {
     if (isAddContent.value) {
-        if (form.name === '') {
+        if (dirForm.name === '') {
             isEditorable.value = false
             return
         }
         ElMessageBox.confirm("是否确认添加目录?")
             .then(() => {
                 addContent({
-                    id: Number(form.id),
-                    name: form.name,
-                    desc: form.desc,
-                    dirId: Number(form.dirId),
+                    id: Number(dirForm.id),
+                    name: dirForm.name,
+                    desc: dirForm.desc,
+                    dirId: Number(dirForm.dirId),
                 }).then(() => {
                     ElMessage({
                         message: '添加成功',
@@ -810,32 +909,29 @@ const handleClose = (done: () => void) => {
                     })
                     isAddContent.value = false
                     if (reload) reload();
-                    done();
                 });
             })
             .catch(() => {
-                done();
             });
         return;
     } else {
         ElMessageBox.confirm("是否确认修改你编辑的内容?")
             .then(() => {
-                updateFile({
-                    id: Number(form.id),
-                    name: form.name,
-                    desc: form.desc,
-                    dirId: Number(form.dirId),
+                updateContent({
+                    id: Number(dirForm.id),
+                    name: dirForm.name,
+                    desc: dirForm.desc,
+                    dirId: Number(dirForm.dirId),
                 }).then(() => {
                     ElMessage({
                         message: '修改成功',
                         type: 'success'
                     })
-                    if (reload) reload();
-                    done();
                 });
+                if (reload) reload();
             })
             .catch(() => {
-                done();
+                isEditorable.value = false
             });
     }
 
@@ -874,12 +970,33 @@ const confirmRemove = async () => {
 };
 // 删除逻辑
 const handleDelete = (_: number, row: KateFileData) => {
-    // 渲染内容删除数据
-    title.value = `是否确认删除 ${row.name}?`;
-    currentId.value = row.id;
-    isFile.value = row.isdocx === 1
-    // 需要判断当前是要删除文件还是目录
-    deleteVisible.value = true;
+    if (row.isdocx == 0) {
+        // if dircetory, need check is empty
+        // 获取文件列表
+        fetchFileList(row.id).then((res: any) => {
+            let fileList: KateFileData[] = res.data.data;
+            if (fileList != null && fileList.length > 0) {
+                ElMessage({
+                    message: `Only delete empty directory ${row.name}!`,
+                    type: "warning",
+                });
+            } else {
+                // 渲染内容删除数据
+                title.value = `是否确认删除 ${row.name}?`
+                currentId.value = row.id
+                isFile.value = false
+                // 需要判断当前是要删除文件还是目录
+                deleteVisible.value = true;
+            }
+        });
+    } else {
+        // 渲染内容删除数据
+        title.value = `是否确认删除 ${row.name}?`;
+        currentId.value = row.id;
+        isFile.value = true
+        // 需要判断当前是要删除文件还是目录
+        deleteVisible.value = true;
+    }
 };
 // ---------------------------数据加载渲染---------------------------
 const route = useRoute();
@@ -899,10 +1016,7 @@ onBeforeMount(async () => {
             element.updatedate = formatDate(element.updatedate);
         });
         data.value = fileList;
-    });
-    // 获取编辑框目录列表
-    await fetchDirList().then((res: any) => {
-        initials.value = res.data.data;
+        removeCurrDir(-1)
     });
 });
 </script>
