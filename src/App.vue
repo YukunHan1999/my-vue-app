@@ -1,83 +1,60 @@
 <template>
   <div>
     <el-drawer v-model="flag" :size="300" :with-header="false" direction="ltr">
-      <el-menu active-text-color="#ffd04b" background-color="#545c64" popper-effect="dark" class="el-menu-vertical-demo"  @select="handleSelect"
-            :default-active="activeUrl" text-color="#fff" >
-            <template v-for="firstMenuItem in menudata">
-              <template v-if="firstMenuItem.children">
-                <el-sub-menu :index="firstMenuItem.index">
-                  <template #title>
-                    <span v-text="firstMenuItem.title"></span>
-                  </template>
-                  <template v-for="secondMenuItem in firstMenuItem.children">
-                    <template v-if="secondMenuItem.children">
-                      <el-sub-menu :index="secondMenuItem.index">
-                        <template #title>
-                          <span v-text="secondMenuItem.title"></span>
-                        </template>
-                        <template v-for="thirdMenuItem in secondMenuItem.children">
-                          <el-menu-item :index="thirdMenuItem.index">
-                            <span v-text="thirdMenuItem.title"></span>
-                          </el-menu-item>
-                        </template>
-                      </el-sub-menu>
+      <el-menu popper-effect="dark" class="el-menu-vertical-demo" @select="handleSelect" :default-active="activeUrl"
+        text-color="#fff">
+        <template v-for="firstMenuItem in menudata">
+          <template v-if="firstMenuItem.children">
+            <el-sub-menu :index="firstMenuItem.index">
+              <template #title>
+                <span v-text="firstMenuItem.title"></span>
+              </template>
+              <template v-for="secondMenuItem in firstMenuItem.children">
+                <template v-if="secondMenuItem.children">
+                  <el-sub-menu :index="secondMenuItem.index">
+                    <template #title>
+                      <span v-text="secondMenuItem.title"></span>
                     </template>
-                    <template v-else>
-                      <el-menu-item :index="secondMenuItem.index">
-                        <span v-text="secondMenuItem.title"></span>
+                    <template v-for="thirdMenuItem in secondMenuItem.children">
+                      <el-menu-item :index="thirdMenuItem.index">
+                        <span v-text="thirdMenuItem.title"></span>
                       </el-menu-item>
                     </template>
-                  </template>
-                </el-sub-menu>
+                  </el-sub-menu>
+                </template>
+                <template v-else>
+                  <el-menu-item :index="secondMenuItem.index">
+                    <span v-text="secondMenuItem.title"></span>
+                  </el-menu-item>
+                </template>
               </template>
-              <template v-else>
-                <el-menu-item :index="firstMenuItem.index">
-                  <span v-text="firstMenuItem.title"></span>
-              </el-menu-item>
-              </template>
-            </template>
+            </el-sub-menu>
+          </template>
+          <template v-else>
+            <el-menu-item :index="firstMenuItem.index">
+              <span v-text="firstMenuItem.title"></span>
+            </el-menu-item>
+          </template>
+        </template>
 
-          </el-menu>
+      </el-menu>
     </el-drawer>
     <router-view v-if="isRouterAlive" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, provide, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, provide, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { initContentNav } from './store';
+import type { MenuItem } from './types/menu.t';
 initContentNav()
 
 const router = useRouter()
-const menudata = [
+const menudata = reactive<MenuItem[]>([
   {
     "index": "/home",
     "title": "Home",
-    children: [
-      {
-        "index": "/home",
-        "title": "目录"
-      },
-      {
-        "index": "/code",
-        "title": "代码"
-      },
-      {
-        "index": "/doc",
-        "title": "文档",
-        children: [
-          {
-            "index": "/code/0",
-            "title": "代码"
-          },
-        ]
-      }
-    ]
-  },
-  {
-    "index": "/home",
-    "title": "Home"
   },
   {
     "index": "/code/0",
@@ -87,7 +64,7 @@ const menudata = [
     "index": "/doc",
     "title": "文档"
   }
-]
+])
 const activeUrl = ref('')
 const handleSelect = (key: string) => {
   router.push({

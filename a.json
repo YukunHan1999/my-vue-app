@@ -1,0 +1,19 @@
+{
+    "data": [
+        {
+            "operationinfo": {
+                "operator": "1"
+            },
+            "mainTable": {
+                "djbh": "HTFK-20250609-0052",
+                "fkpzh": "123456",
+                "fypzh": "123456"
+            }
+        }
+    ],
+    "header": {
+        "systemid": "ERPPZH",
+        "currentDateTime": "20250804162514",
+        "Md5": "047f60f2cd43c5d1a7d07dd131219d31"
+    }
+}
