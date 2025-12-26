@@ -76,8 +76,10 @@
                             </el-col>
                             <el-col :offset="1" :span="4">
                                 <el-form-item label="所属目录:">
-                                    <el-select v-model="pkgTableData.dirid" filterable placeholder="Please select" style="width: 240px">
-                                        <el-option v-for="item in dirArr" :key="item.id" :label="item.name" :value="Number(item.id)" />
+                                    <el-select v-model="pkgTableData.dirid" filterable placeholder="Please select"
+                                        style="width: 240px">
+                                        <el-option v-for="item in dirArr" :key="item.id" :label="item.name"
+                                            :value="Number(item.id)" />
                                     </el-select>
                                 </el-form-item>
                             </el-col>
@@ -831,7 +833,7 @@ const removeCurrDir = (curid: number) => {
     // 获取编辑框目录列表
     fetchDirList().then((res: any) => {
         initials.value = res.data.data
-        let first :KateFileData = {    
+        let first: KateFileData = {
             id: '0',
             name: 'root',
             desc: '',
@@ -1011,11 +1013,22 @@ onBeforeMount(async () => {
     // 获取文件列表
     await fetchFileList(parentId.value).then((res: any) => {
         let fileList: KateFileData[] = res.data.data;
+        // handler date format
         fileList.forEach((element) => {
             element.createdate = formatDate(element.createdate);
             element.updatedate = formatDate(element.updatedate);
         });
-        data.value = fileList;
+        // handler sort
+        data.value = fileList.sort((a, b) => {
+            // 提取目标字段：a.name 和 b.name，进行基础字符串比较
+            if (a.name < b.name) {
+                return -1; // a 排在 b 前面
+            }
+            if (a.name > b.name) {
+                return 1; // a 排在 b 后面
+            }
+            return 0; // 两者排序位置相等
+        });
         removeCurrDir(-1)
     });
 });
