@@ -3,6 +3,7 @@ import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-rou
 import Home from '@/views/home/index.vue'
 import Code from '@/views/code/edit.vue'
 import Directory from '@/views/code/directory.vue'
+import Env from '@/views/env/index.vue'
 import Doc from '@/views/doc/index.vue'
 const routes: Array<RouteRecordRaw> = [
   {
@@ -38,6 +39,14 @@ const routes: Array<RouteRecordRaw> = [
         path: '/preview',
         name: 'preview',
         component: Code
+      },
+      {
+        path: '/env/:id',
+        name: 'env',
+        component: Env,
+        meta: {
+          title: 'env'
+        }
       }
     ]
   }

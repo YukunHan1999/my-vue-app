@@ -8,7 +8,7 @@
 import { ArrowRight } from '@element-plus/icons-vue'
 import { onMounted, ref, inject } from 'vue';
 import type { BreadCrumbData } from '../types/data.t';
-import { addContentNav, getNav } from '../store/contentnav'
+import { addZipNav, getZipNav } from '../store/zipnav'
 import { useRouter } from 'vue-router'; 
 
 const router = useRouter()
@@ -25,13 +25,13 @@ const router = useRouter()
  */
 const nav = ref<Array<BreadCrumbData>>([])
 onMounted(() => {
-  nav.value = getNav()
+  nav.value = getZipNav()
 })
 
 const reload : Function | undefined = inject('reloadFile')
 const changeRouter = async (item: BreadCrumbData) => {
-  addContentNav(item)
-  await router.push(`/code/${item.id}`)
+  addZipNav(item)
+  await router.push(`/env/${item.id}`)
   if (reload) reload()
 }
 </script>

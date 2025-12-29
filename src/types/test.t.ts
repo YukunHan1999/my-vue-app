@@ -1,18 +1,18 @@
 export interface LoginData {
-  username: string,
+  username: string
   password: string
 }
 
 export interface CodeTemplate {
-  id: string,
+  id: string
   lang: string
-  name: string,
-  code: string,
+  name: string
+  code: string
   tips: string
 }
 
 export interface ApiResult {
-  code: Number,
-  errMsg: string,
+  code: Number
+  errMsg: string
   data: Array<CodeTemplate>
 }

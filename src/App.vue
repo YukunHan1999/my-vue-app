@@ -46,9 +46,9 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, provide, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { initContentNav } from './store';
 import type { MenuItem } from './types/menu.t';
-initContentNav()
+import { getZipNav, initZipNav } from './store/zipnav';
+import { getNav, initContentNav } from './store/contentnav';
 
 const router = useRouter()
 const menudata = reactive<MenuItem[]>([
@@ -63,10 +63,27 @@ const menudata = reactive<MenuItem[]>([
   {
     "index": "/doc",
     "title": "文档"
+  },
+  {
+    "index": "/env/0",
+    "title": "ENV"
   }
 ])
 const activeUrl = ref('')
 const handleSelect = (key: string) => {
+  if (key === '/code/0') {
+    const nav = getNav()
+    if (nav.length > 1) {
+        // skip to position
+        key = `/code/${nav[nav.length - 1].id}`
+    }
+  } else if (key === '/env/0') {
+    const nav = getZipNav()
+    if (nav.length > 1) {
+        // skip to position
+        key = `/env/${nav[nav.length - 1].id}`
+    }
+  }
   router.push({
     path: key
   })
@@ -74,6 +91,8 @@ const handleSelect = (key: string) => {
 
 // =====================================================注册监听
 onMounted(() => {
+  initZipNav()
+  initContentNav()
   window.addEventListener('keydown', handleKeyDown);
 });
 onUnmounted(() => {

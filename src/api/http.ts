@@ -1,5 +1,6 @@
 import type { CodeTemplate } from '../types/test.t'
 import type { DirData,  RemovePkgOrDir, PkgInfo, ClearPkg} from '../types/data.t'
+import type { EnvData } from '../types/zip.t'
 import $http from './index'
 
 // 登录请求
@@ -34,3 +35,10 @@ export const loadCodeData = (pageNo: Number, pageSize: Number) => $http({ url: "
 export const saveOrUpdateCodeTemplate = (code: CodeTemplate) => $http({ url: "/api/code", method: "POST", data: code} )
 // 删除数据
 export const deleteCodeTemplate = (id: Number) => $http({ url: "/api/code/" + id, method: "DELETE" })
+
+// env
+export const createEnvData = (data: EnvData) => $http({ url: `/api/env`, method: "POST", data })
+export const deleteEnvData = (id: Number) => $http({ url: `/api/env/${id}`, method: "DELETE" })
+export const updateEnvData = (data: EnvData) => $http({ url: '/api/env', method: "PUT", data })
+export const loadEnvData = (pid: string) => $http({ url: `/api/env/${pid}`, method: "GET" })
+export const loadEnvDirData = () => $http({url: `/api/env/dir`, method: "GET"})

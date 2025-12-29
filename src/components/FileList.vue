@@ -186,8 +186,12 @@
                             <div>{{ scope.row.desc }}</div>
                         </template>
                         <template #reference>
-                            <el-tag effect="dark" :type="scope.row.isdocx ? 'primary' : 'success'"
-                                @click="skip(scope.row)">{{ scope.row.name }}</el-tag>
+                            <el-tag effect="dark" @click="skipDir(scope.row)" v-if="scope.row.isdocx == 0" type="primary">
+                                {{ scope.row.name }}
+                            </el-tag>
+                            <el-tag effect="dark" @click="skipPkg(scope.row)" v-else type="success">
+                                {{ scope.row.name }}
+                            </el-tag>
                         </template>
                     </el-popover>
                 </template>
@@ -232,9 +236,10 @@ import {
 import type { PkgInfo, ClearPkg, DebugInfoData, KateFileData, PackageData, ProgramData, RemovePkgOrDir } from "../types/data.t";
 import { formatDate } from "../util/dateutil";
 import { ElMessage, ElMessageBox, type UploadProps } from "element-plus";
-import { addContentNav, setPackageData } from "../store/index";
+import { addContentNav } from "../store/contentnav";
 import { Plus, Edit, Delete, CirclePlus } from "@element-plus/icons-vue";
 import { v4 as uuidv4 } from 'uuid';
+import { setPackageData } from "../store/pkgdata";
 
 //=======================================================================PACKAGE
 // add or edit pkg
@@ -263,10 +268,11 @@ const pkgTableData = reactive<PackageData>({
     pgm: []
 })
 // preview package info
-const previewPkgInfo = () => {
+const previewPkgInfo = async () => {
     setPackageData(pkgTableData)
-    const routePath = router.resolve('/preview').href
-    window.open(routePath, '_blank'); // Open in new tab
+    await router.push({ path: `/preview` });
+    // const routePath = router.resolve('/preview').href
+    // window.open(routePath, '_blank'); // Open in new tab
 }
 // save package info
 const savePkgInfo = () => {
@@ -789,25 +795,24 @@ const openAddForm = () => {
 };
 // -----------------------------------------------------
 const reload: Function | undefined = inject<Function>("reloadFile");
-const skip = async (row: KateFileData) => {
-    if (row.isdocx === 0) {
-        // handler directory
-        let nav = {
-            id: row.id,
-            label: row.name,
-        };
-        addContentNav(nav);
-        await router.push({ path: `/code/${nav.id}` });
-        if (reload) reload();
-    } else {
-        loadPkg(row.id).then((res: any) => {
-            setPackageData(res.data.data)
-            const routePath = router.resolve('/preview').href
-            window.open(routePath, '_blank'); // Open in new tab
-        })
-    }
+const skipDir = async (row: KateFileData) => {
+    // handler directory
+    let nav = {
+        id: row.id,
+        label: row.name,
+    };
+    addContentNav(nav);
+    await router.push({ path: `/code/${nav.id}` });
+    if (reload) reload();
 };
-
+const skipPkg = (row: KateFileData) => {
+    loadPkg(row.id).then(async (res: any) => {
+        setPackageData(res.data.data)
+        await router.push({ path: `/preview` });
+        // const routePath = router.resolve('/preview').href
+        // window.open(routePath, '_blank'); // Open in new tab
+    })
+};
 // ---------------------------文件的修改删除逻辑---------------------------
 
 // 编辑逻辑

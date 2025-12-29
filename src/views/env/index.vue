@@ -1,16 +1,16 @@
 <template>
     <div class="container">
         <div class="maincontainer">
-            <bread-crumb />
+            <ZipBreadCrumb />
             <el-divider content-position="left">文件列表</el-divider>
-            <file-list></file-list>
+            <zip-list></zip-list>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import BreadCrumb from '../../components/BreadCrumb.vue';
-import FileList from '../../components/FileList.vue';
+import ZipBreadCrumb from '../../components/ZipBreadCrumb.vue';
+import ZipList from '../../components/ZipList.vue';
 </script>
 
 <style scoped>

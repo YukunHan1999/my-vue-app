@@ -31,7 +31,7 @@
 <script lang="ts" setup>
 import * as monaco from 'monaco-editor';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { getPackageData } from '../../store/index'
+import { getPackageData } from '../../store/pkgdata'
 import type { PackageData, ProgramData } from '../../types/data.t';
 
 const currentPgm = ref<ProgramData>()
@@ -88,7 +88,7 @@ const selectedLine = ref<Number>() // 选择行
 const urls = ref<Array<string>>([])
 const getImageUrl = (lineNumber: Number) => {
     let urlarr :string[] = []
-    if (currentPgm.value) {
+    if (currentPgm.value && currentPgm.value.dbg && currentPgm.value.dbg.length > 0) {
         for (let dbg of currentPgm.value.dbg) {
             if (dbg.lineno == lineNumber && dbg.atturl !== '') {
                 urlarr.push("/api/preview/" + dbg.atturl)
