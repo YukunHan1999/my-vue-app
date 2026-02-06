@@ -18,4 +18,4 @@ push: release
 
 run: release
 	echo "run myvueapp"
-	docker run -p 80:80 --name myvueapp -d myvueapp:${tag}
+	docker run -p 80:80 --name myvueapp --add-host=host.docker.internal:host-gateway -d myvueapp:${tag}

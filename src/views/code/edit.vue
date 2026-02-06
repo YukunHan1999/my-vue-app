@@ -101,13 +101,14 @@ const initMonaco = () => {
     if (!editorContainer.value) return;
     editor = monaco.editor.create(editorContainer.value, {
         value: pkgData.value?.pgm[0].pgmcode,
-        language: 'java',
+        language: 'markdown',
         theme: 'vs-dark',
         readOnly: true,
         lineNumbers: 'on',
         fontSize: 15,
         padding: { top: 12, bottom: 12 },
-        scrollBeyondLastLine: false,
+        scrollBeyondLastLine: true,
+        wordWrap: 'on',
     });
     editor.onMouseDown((e) => {
         const position = e.target.position;

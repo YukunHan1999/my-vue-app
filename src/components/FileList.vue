@@ -148,7 +148,6 @@
                 <div style="flex: auto">
                     <el-button type="warning" @click="cancelPkgInfo">cancel</el-button>
                     <el-button type="success" @click="savePkgInfo">Save</el-button>
-                    <el-button type="primary" @click="previewPkgInfo">Preview</el-button>
                 </div>
             </template>
         </el-drawer>
@@ -267,14 +266,6 @@ const pkgTableData = reactive<PackageData>({
     dirid: 0,
     pgm: []
 })
-// preview package info
-const previewPkgInfo = async () => {
-    setPackageData(pkgTableData)
-    await router.push({ path: `/preview` });
-    // const routePath = router.resolve('/preview').href
-    // window.open(routePath, '_blank'); // Open in new tab
-}
-// save package info
 const savePkgInfo = () => {
     let attids: number[] = []
     for (let tmp of clearAttIdArray) {
